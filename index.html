@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>होलिका दहन की शुभकामनाएँ</title>
+    <link href="https://fonts.googleapis.com/css2?family=Hind:wght@400;700&family=Yantraavarta:wght@900&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --fire: #ff4500;
+            --gold: #ffcc00;
+            --wa: #25D366;
+        }
+
+        body {
+            margin: 0;
+            font-family: 'Hind', sans-serif;
+            background: radial-gradient(circle at center, #1b2735 0%, #090a0f 100%);
+            color: white;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+            overflow-x: hidden;
+        }
+
+        /* मुख्य कार्ड */
+        .wish-card {
+            background: rgba(0, 0, 225, 0.08);
+            backdrop-filter: blur(12px);
+            padding: 25px;
+            border-radius: 25px;
+            border: 1px solid rgba(0, 0, 250, 0.15);
+            max-width: 450px;
+            width: 100%;
+            text-align: center;
+            box-shadow: 0 10px 50px rgba(0,0,0,0.7);
+            margin-bottom: 20px;
+        }
+
+        .from-text { font-size: 0.9rem; letter-spacing: 2px; color: #ddd; margin-bottom: 5px; }
+        
+        .name-display {
+            font-family: 'Yantraavarta', sans-serif;
+            color: var(--gold);
+            font-size: 2.5rem;
+            margin: 0;
+            text-shadow: 0 0 20px var(--fire);
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+
+        /* होलिका अग्नि एनिमेशन */
+        .fire-stage { height: 160px; position: relative; margin: 30px 0; }
+        
+        .flame {
+            width: 60px; height: 60px; background: var(--fire);
+            border-radius: 50% 0 50% 50%; transform: rotate(-45deg);
+            position: absolute; left: 50%; margin-left: -30px; bottom: 35px;
+            display: none; animation: burn 0.4s infinite alternate;
+            box-shadow: 0 -10px 40px var(--fire), 0 0 60px yellow;
+        }
+
+        @keyframes burn { 
+            from { transform: rotate(-45deg) scale(1.1); } 
+            to { transform: rotate(-45deg) scale(1.3); opacity: 0.8; } 
+        }
+
+        .wood-logs { 
+            width: 100px; height: 20px; background: #4e342e; margin: 0 auto; 
+            position: absolute; bottom: 10px; left: 50%; margin-left: -50px; 
+            border-radius: 5px; box-shadow: inset 0 0 10px #000;
+        }
+
+        /* इनपुट और बटन */
+        .input-box {
+            width: 85%; padding: 12px; border-radius: 30px; border: 2px solid var(--gold);
+            background: transparent; color: white; text-align: center; font-size: 1rem; margin-bottom: 15px;
+        }
+
+        .action-btn {
+            padding: 14px 30px; border-radius: 30px; border: none; font-weight: bold;
+            cursor: pointer; font-size: 1.1rem; text-decoration: none; display: inline-block;
+            transition: 0.3s; width: 85%;
+        }
+
+        .fire-btn { background: linear-gradient(45deg, #ff416c, #ff4b2b); color: white; margin-bottom: 10px; }
+        
+        .whatsapp-btn { 
+            background-color: var(--wa); color: white; display: none; 
+            animation: bounce 1s infinite; margin-top: 15px;
+        }
+
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-5px); }
+        }
+
+        .footer { margin-top: 20px; font-size: 0.8rem; opacity: 0.5; }
+    </style>
+</head>
+<body>
+
+    <audio id="fireSound" loop>
+        <source src="https://www.soundjay.com/nature/sounds/fire-1.mp3" type="audio/mpeg">
+    </audio>
+
+    <div class="wish-card">
+        <p class="from-text">आपको शुभकामनाएँ भेजी हैं</p>
+        <h1 id="userName" class="name-display">किसी खास ने</h1>
+        
+        <div class="fire-stage">
+            <div id="mainFlame" class="flame"></div>
+            <div class="wood-logs"></div>
+        </div>
+
+        <h2 style="color: var(--gold); margin-bottom: 10px;">शुभ होलिका दहन!</h2>
+        <p>"अधर्म पर धर्म की जीत का यह पावन पर्व आपके जीवन के समस्त दुखों का नाश करे।"</p>
+        
+        <button class="fire-btn action-btn" onclick="igniteFire()">🔥 अग्नि जलायें</button>
+    </div>
+
+    <div class="wish-card" style="border: 1px dashed var(--gold);">
+        <h3>अपना लिंक यहाँ बनायें</h3>
+        <input type="text" id="nameInput" class="input-box" placeholder="अपना नाम लिखें...">
+        <button class="fire-btn action-btn" onclick="createLink()">लिंक तैयार करें</button>
+        
+        <a id="waLink" href="#" class="whatsapp-btn action-btn" target="_blank">
+            WhatsApp पर शेयर करें 📱
+        </a>
+    </div>
+
+    <div class="footer">होलिका दहन २०२६ - बुराई पर अच्छाई की जीत</div>
+
+    <script>
+        // 1. URL से नाम पढ़ना (Link Parsing)
+        const params = new URLSearchParams(window.location.search);
+        const nameFromUrl = params.get('n');
+        if (nameFromUrl) {
+            document.getElementById('userName').innerText = decodeURIComponent(nameFromUrl);
+        }
+
+        // 2. आग और ध्वनि चालू करना
+        function igniteFire() {
+            document.getElementById('mainFlame').style.display = 'block';
+            const audio = document.getElementById('fireSound');
+            audio.play().catch(() => {
+                alert("अग्नि प्रज्वलित हो गई है! (ध्वनि के लिए ब्राउज़र अनुमति दें)");
+            });
+        }
+
+        // 3. सही शेयरिंग लिंक बनाना
+        function createLink() {
+            const name = document.getElementById('nameInput').value;
+            if (!name) {
+                alert("कृपया पहले अपना नाम लिखें!");
+                return;
+            }
+
+            // वर्तमान पेज का URL लें
+            let currentUrl = window.location.origin + window.location.pathname;
+            
+            // अगर फाइल कंप्यूटर पर खुली है (Local file) तो एक डमी लिंक दिखाएँ
+            if (window.location.protocol === 'file:') {
+                currentUrl = "https://your-website.com"; // इसे बाद में अपनी असली वेबसाइट से बदलें
+            }
+
+            const shareUrl = `${currentUrl}?n=${encodeURIComponent(name)}`;
+            
+            // व्हाट्सएप संदेश
+            const waMsg = `🔥 *होलिका दहन की शुभकामनाएँ!* 🔥\n\n*${name}* ने आपके लिए एक सरप्राइज भेजा है। देखने के लिए इस लिंक पर क्लिक करें:\n\n👉 ${shareUrl}`;
+            
+            // व्हाट्सएप बटन दिखाना
+            const waBtn = document.getElementById('waLink');
+            waBtn.href = `https://api.whatsapp.com/send?text=${encodeURIComponent(waMsg)}`;
+            waBtn.style.display = 'inline-block';
+            
+            alert("आपका लिंक तैयार है! अब नीचे दिख रहे 'WhatsApp पर शेयर करें' बटन पर क्लिक करें।");
+        }
+    </script>
+</body>
+</html>
